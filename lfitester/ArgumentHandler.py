@@ -1,5 +1,4 @@
 import argparse
-from .bannermagic import printBannerPadding, printMessage
 from argparse import RawDescriptionHelpFormatter
 import pathlib
 try:
@@ -14,7 +13,6 @@ from .PacketParser import PacketParser
 class ArgumentHandler:
 
     def __init__(self):
-        self.printBanner()
         self.parser = self.ConfigureParser()
         args = self.parser.parse_args()
 
@@ -90,12 +88,6 @@ class ArgumentHandler:
         os.system(cmd)
         print(colored('[+]', 'green', attrs=['bold']) +
               ' Updated successfully')
-
-    def printBanner(self):
-        printBannerPadding('*')
-        printMessage('LFITester')
-        printMessage('Automated LFI Testing')
-        printBannerPadding('*')
 
     def ConfigureParser(self):
         parser = argparse.ArgumentParser(prog='LFITester.py', description="""
