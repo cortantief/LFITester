@@ -1,5 +1,5 @@
 import argparse
-from bannermagic import printBannerPadding, printMessage
+from .bannermagic import printBannerPadding, printMessage
 from argparse import RawDescriptionHelpFormatter
 import pathlib
 try:
@@ -8,7 +8,7 @@ except ImportError:
     print("There were issues importing git. Auto-update might fail...")
 import os
 from termcolor import colored
-from PacketParser import PacketParser
+from .PacketParser import PacketParser
 
 
 class ArgumentHandler:
@@ -24,7 +24,7 @@ class ArgumentHandler:
         self.verbosity = args.verbose
         if args.input_url:
             self.url = args.input_url
-        else: 
+        else:
             if args.input_url_file:
                 lines = []
                 for line in args.input_url_file:
@@ -41,7 +41,7 @@ class ArgumentHandler:
                 lines.append(line.strip())
             self.poc = lines
             self.override_poc = True
-       
+
         self.crawler = args.crawler
         self.enable_proxies = args.enabled_proxies
         self.outfile = args.outfile
@@ -50,7 +50,7 @@ class ArgumentHandler:
         self.cookies = args.cookies
         self.autopwn = args.autopwn
         self.mode = args.mode
-        
+
         self.force = args.force
         if self.mode == None:
             self.mode = 0
@@ -73,9 +73,9 @@ class ArgumentHandler:
             self.cookies = parser.get_cookies()
             self.url = parser.get_url()
 
-
     def update(self):
-        print(colored('[!]', 'yellow', attrs=['bold']) + ' Checking for updates...')
+        print(colored('[!]', 'yellow', attrs=['bold']) +
+              ' Checking for updates...')
         # Get path of the directory of the repo
         repo_path = os.path.dirname(__file__)
         # Find the repo of the program
@@ -88,7 +88,8 @@ class ArgumentHandler:
         cmd = '/usr/bin/chmod +x ' + str(repo_path) + '/LFITester.py'
         # execute the command
         os.system(cmd)
-        print(colored('[+]', 'green', attrs=['bold']) + ' Updated successfully')
+        print(colored('[+]', 'green', attrs=['bold']) +
+              ' Updated successfully')
 
     def printBanner(self):
         printBannerPadding('*')
@@ -96,7 +97,7 @@ class ArgumentHandler:
         printMessage('Automated LFI Testing')
         printBannerPadding('*')
 
-    def ConfigureParser(self):   
+    def ConfigureParser(self):
         parser = argparse.ArgumentParser(prog='LFITester.py', description="""
         Payload Modes:
         0:  Simple bash TCP
@@ -146,8 +147,8 @@ class ArgumentHandler:
         44: Netcat alternative bash
         45: Netcat openBSD
         46: Ncat
-        47: Ncat UDP """ ,
-        epilog='''Proxies in the list must be in the following format: protocol://{proxyip} 
+        47: Ncat UDP """,
+                                         epilog='''Proxies in the list must be in the following format: protocol://{proxyip} 
 username:password (newline). If you dont have a authenticated 
 proxy then skip the username:password entry and go for a new line
 
@@ -163,24 +164,38 @@ Developers: Konstantinos Papanagnou (https://github.com/Konstantinos-Papanagnou)
             Konstantinos Pantazis   (https://github.com/kostas-pa)
             Timothy Stowe           (https://github.com/timothy90990)
             ''', formatter_class=RawDescriptionHelpFormatter)
-        parser.add_argument('-u', '--url', dest="input_url", metavar='URL', help='The url to test. The URL usually is http://[URL]?[something]=')
-        parser.add_argument('-L', '--list-url', dest="input_url_file", metavar='URL_File', help='Input a list of URLs from an external file. The URLs format usually is http://[URL]?[something]=', type=argparse.FileType('r'))
-        parser.add_argument('-c', '--crawl', dest="crawler", action='store_true', help='use the crawler to test all the endpoints')
-        parser.add_argument('-v', '--verbose', action='count', help='Increase output verbosity', default=0)
-        parser.add_argument('-o', '--output', nargs='?', dest="outfile", help='The file to save the results', type=argparse.FileType('w'))
-        parser.add_argument('--creds', nargs='?', dest="creds", metavar='user:pass', help='The credentials to login', type=str)
-        parser.add_argument('-p', '--enable-proxies', dest="enabled_proxies", action='store_true', help="""Enable proxy redirection. Default proxies are free and you can change them. If you don't want the default proxies you can supply your own and this option will be overridden! Note that the proxies will be picked at random for each request""")
-        parser.add_argument('--autopwn', dest='autopwn', metavar='IP', help="If the webapp is vulnerable to LFI then it will attempt to exploit it and give back a shell. This option requires your IP in order to connect with the revshell", type=str)
-        parser.add_argument('-m', '--mode', dest='mode', metavar='Payload', help='Select the payload that suits best. Try different ones if the exploit doesn\'t work.', type=int)
-        parser.add_argument('-f', '--force', dest='force', help="Treat endpoint as alive even if it returns 404", action='store_true')
-        parser.add_argument('--update', dest='update', help="Update LFITester", action='store_true')
-        parser.add_argument('--batch-ans', dest='batch', help="Answer all yes/no", type=str)
-        parser.add_argument('-s', '--stealth', dest='stealth', help='Enable stealth mode', action='store_true')
-        parser.add_argument('--poc-file', dest='poc', help="Your custom poc file.", type=argparse.FileType('r'))
-        parser.add_argument('-H', '--headers', dest="headers", metavar='HEADERS', help='Add extra headers')
-        parser.add_argument('-C', '--cookies', dest="cookies", metavar='COOKIES', help='Add extra cookies')
-        parser.add_argument("-r", '--packet-file', dest="packet_file", metavar='PACKET_FILE', 
-                           help='Import headers/cookies/body from a packet file (HTTP or Burp format)')
+        parser.add_argument('-u', '--url', dest="input_url", metavar='URL',
+                            help='The url to test. The URL usually is http://[URL]?[something]=')
+        parser.add_argument('-L', '--list-url', dest="input_url_file", metavar='URL_File',
+                            help='Input a list of URLs from an external file. The URLs format usually is http://[URL]?[something]=', type=argparse.FileType('r'))
+        parser.add_argument('-c', '--crawl', dest="crawler", action='store_true',
+                            help='use the crawler to test all the endpoints')
+        parser.add_argument('-v', '--verbose', action='count',
+                            help='Increase output verbosity', default=0)
+        parser.add_argument('-o', '--output', nargs='?', dest="outfile",
+                            help='The file to save the results', type=argparse.FileType('w'))
+        parser.add_argument('--creds', nargs='?', dest="creds",
+                            metavar='user:pass', help='The credentials to login', type=str)
+        parser.add_argument('-p', '--enable-proxies', dest="enabled_proxies", action='store_true',
+                            help="""Enable proxy redirection. Default proxies are free and you can change them. If you don't want the default proxies you can supply your own and this option will be overridden! Note that the proxies will be picked at random for each request""")
+        parser.add_argument('--autopwn', dest='autopwn', metavar='IP',
+                            help="If the webapp is vulnerable to LFI then it will attempt to exploit it and give back a shell. This option requires your IP in order to connect with the revshell", type=str)
+        parser.add_argument('-m', '--mode', dest='mode', metavar='Payload',
+                            help='Select the payload that suits best. Try different ones if the exploit doesn\'t work.', type=int)
+        parser.add_argument('-f', '--force', dest='force',
+                            help="Treat endpoint as alive even if it returns 404", action='store_true')
+        parser.add_argument('--update', dest='update',
+                            help="Update LFITester", action='store_true')
+        parser.add_argument('--batch-ans', dest='batch',
+                            help="Answer all yes/no", type=str)
+        parser.add_argument('-s', '--stealth', dest='stealth',
+                            help='Enable stealth mode', action='store_true')
+        parser.add_argument('--poc-file', dest='poc',
+                            help="Your custom poc file.", type=argparse.FileType('r'))
+        parser.add_argument('-H', '--headers', dest="headers",
+                            metavar='HEADERS', help='Add extra headers')
+        parser.add_argument('-C', '--cookies', dest="cookies",
+                            metavar='COOKIES', help='Add extra cookies')
+        parser.add_argument("-r", '--packet-file', dest="packet_file", metavar='PACKET_FILE',
+                            help='Import headers/cookies/body from a packet file (HTTP or Burp format)')
         return parser
-
-
